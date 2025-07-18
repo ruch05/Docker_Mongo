@@ -15,15 +15,15 @@ docker rmi image_name
 
 
 docker run -d -e ENV_VAR=VAR_VALUE --name CUSTOM_NAME -p8080:8080 image_name 
-# -d means detached mode, -e means env variables, --name is the tag when you want to name the container, -p is to bind the ports of server with the container/image port
-# Example: docker run -d -e MYSQL_ROOT_PASSWORD=secret --name mysql_latest -p8080:3306 mysql
-# MYSQL_ROOT_PASSWORD is mandatory env variable that we need to set - we know this from documentation of an image, 'mysql' in this case
-# Here 3306 is the port that sql listens on, again, which is mentioned in mysql image documentation on docker hub
+#-d means detached mode, -e means env variables, --name is the tag when you want to name the container, -p is to bind the ports of server with the container/image port
+#Example: docker run -d -e MYSQL_ROOT_PASSWORD=secret --name mysql_latest -p8080:3306 mysql
+#MYSQL_ROOT_PASSWORD is mandatory env variable that we need to set - we know this from documentation of an image, 'mysql' in this case
+#Here 3306 is the port that sql listens on, again, which is mentioned in mysql image documentation on docker hub
 
 
 docker exec -it container_name /bin/bash
 #exec executes the command that is passed after the container_name; -it means interactive mode
-# Example: docker exec -it mysql_latest /bin/bash
+#Example: docker exec -it mysql_latest /bin/bash
 
 
 docker login
@@ -46,9 +46,45 @@ MAIN ADVANTAGE is all containers run on the same network which are present in on
 In this project, you can check 'mongo.yaml' file to see how this file looks.
 BE AWARE OF CORRECT YAML FORMAT
 
-docker compose -f mongodb.yaml up -d  # -f means file that needs to be run; up is the main command to start running the file
-docker compose -f mongodb.yaml down # down command is to stop and delete the running containers
+docker compose -f mongodb.yaml up -d  #-f means file that needs to be run; up is the main command to start running the file
+docker compose -f mongodb.yaml down #down command is to stop and delete the running containers
 
 DOCKERFILE
-Now, Dockerfile is a file with which you can containerize your apps.
+Now, Dockerfile is a file with which you can containerize your apps. Not just containerize your app but also it's dependies.
+FROM node            #FROM means which base layer you want to use for your app
+WORKDIR path         #WORKDIR means the working directory that you need to set from which these following commands in dockerfile run. It's like running "cd" in a shell — it tells Docker, “From here on, assume we’re inside this folder.”
+ENV key=value        #ENV means environment variables that you pass with docker run cmds usually to run the container of an image
+RUN cmd              #RUN runs the following command that you specify, for example RUN mkdir testapp
+COPY src dest        #COPY copies the source to destination
+CMD ["x", "y"]       #CMD runs the command 'x y'. For ex: CMD ["node", "/testapp/server.js"] runs "node /testapp/server.js". This can only be used once. RUN command can be placed multiple times in the dockerfile but there can only be one CMD command.
+EXPOSE port_number   #EXPOSE will expose the app on the given port number
 
+
+
+A sample Dockerfile is following: (The name of the file is 'Dockerfile')
+
+FROM node
+
+ENV MONGO_DB_USERNAME=admin
+
+ENV MONGO_DB_PWD=qwerty
+
+ENV MONGO_HOST=mongo
+
+RUN mkdir -p testapp
+
+COPY . /testapp
+
+CMD ["node", "/testapp/server.js"]
+
+
+Now we build an image from this Dockerfile which will be the image of our app here, which will then be used to run a container that'd kickstart our app.
+
+docker build -t testapp:1.0 dockerfile_dir      #-t means tag where we can provide the version of our project/image also. dockerfile_dir is the directory where the Dockerfile exists. For example : docker build -t testapp:1.0 .
+
+This builds the image : testapp:1.0
+Now you can give this image to your teammates who can then use your app simply by running a container from this image.
+
+docker run -p5050:5050 --network docker-testapp_default testapp:1.0 #-p binds the port 5050 of the app with our server port. --network needs to be given here because we need to connect mongodb which runs from docker compose yaml file which creates a network interface and that network interface needs to be same for our app so our app can connect with mongodb.
+
+In the next project, I'll polish this project and use docker compose file to run my app as well.
