@@ -1,4 +1,4 @@
-# Learning Docker by Implementing a New Project
+## Learning Docker by Implementing a New Project
 
 Learning docker by implementing a new project where a node.js app is connected to the docker image of mongo and mongodb express on a common network with docker compose file and is run to use the database for adding and displaying user accounts info.
 
@@ -21,17 +21,32 @@ docker rmi image_name
 ```
 
 ```bash
-docker run -d -e ENV_VAR=VAR_VALUE --name CUSTOM_NAME -p8080:8080 image_name 
-# -d means detached mode, -e means env variables, --name is the tag when you want to name the container, -p is to bind the ports of server with the container/image port
-# Example: docker run -d -e MYSQL_ROOT_PASSWORD=secret --name mysql_latest -p8080:3306 mysql
-# MYSQL_ROOT_PASSWORD is mandatory env variable that we need to set - we know this from documentation of an image, 'mysql' in this case
-# Here 3306 is the port that sql listens on, again, which is mentioned in mysql image documentation on docker hub
+docker run -d -e ENV_VAR=VAR_VALUE --name CUSTOM_NAME -p8080:8080 image_name
 ```
+
+ - -d means detached mode
+ - -e means env variables
+ - --name is the tag when you want to name the container
+ - -p is to bind the ports of server with the container/image port
+
+Example:
+ ```bash
+ docker run -d -e MYSQL_ROOT_PASSWORD=secret --name mysql_latest -p8080:3306 mysql
+ ```
+ MYSQL_ROOT_PASSWORD is mandatory env variable that we need to set - we know this from documentation of an image, 'mysql' in this case.
+ 
+ Here 3306 is the port that sql listens on, again, which is mentioned in mysql image documentation on docker hub
+
 
 ```bash
 docker exec -it container_name /bin/bash
-# exec executes the command that is passed after the container_name; -it means interactive mode
-# Example: docker exec -it mysql_latest /bin/bash
+```
+
+ - exec executes the command that is passed after the container_name
+ - -it means interactive mode
+ Example:
+ ```bash
+ docker exec -it mysql_latest /bin/bash
 ```
 
 ```bash
@@ -42,9 +57,14 @@ docker start container_name
 docker stop container_name
 docker rm container_name
 docker logs container_name
-docker exec -it container_name /bin/bash
-# exec executes the command that is passed after the container_name; -it means interactive mode
 ```
+
+```bash
+docker exec -it container_name /bin/bash
+```
+ - exec executes the command that is passed after the container_name
+ - -it means interactive mode
+
 
 ```bash
 docker network ls
@@ -61,9 +81,15 @@ In this project, you can check `mongo.yaml` file to see how this file looks.
 **BE AWARE OF CORRECT YAML FORMAT**
 
 ```bash
-docker compose -f mongodb.yaml up -d      # -f means file that needs to be run; up is the main command to start running the file
-docker compose -f mongodb.yaml down       # down command is to stop and delete the running containers
+docker compose -f mongodb.yaml up -d
 ```
+- -f means file that needs to be run; up is the main command to start running the file
+
+```bash
+docker compose -f mongodb.yaml down
+```
+- down command is to stop and delete the running containers
+
 
 ---
 
@@ -104,15 +130,26 @@ CMD ["node", "/testapp/server.js"]
 Now we build an image from this Dockerfile which will be the image of our app here, which will then be used to run a container that'd kickstart our app.
 
 ```bash
-docker build -t testapp:1.0 dockerfile_dir      # -t means tag where we can provide the version of our project/image also. dockerfile_dir is the directory where the Dockerfile exists. For example : docker build -t testapp:1.0 .
+docker build -t testapp:1.0 dockerfile_dir
+```
+
+- -t means tag where we can provide the version of our project/image also
+- dockerfile_dir is the directory where the Dockerfile exists.
+
+For example : 
+```bash
+docker build -t testapp:1.0 .
 ```
 
 This builds the image : `testapp:1.0`  
 Now you can give this image to your teammates who can then use your app simply by running a container from this image.
 
 ```bash
-docker run -p5050:5050 --network docker-testapp_default testapp:1.0   # -p binds the port 5050 of the app with our server port. --network needs to be given here because we need to connect mongodb which runs on the same network.
+docker run -p5050:5050 --network docker-testapp_default testapp:1.0
 ```
+- -p binds the port 5050 of the app with our server port
+- --network needs to be given here because we need to connect mongodb which runs on the same network.
+
 
 ---
 
