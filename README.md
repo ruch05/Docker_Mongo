@@ -44,6 +44,7 @@ docker exec -it container_name /bin/bash
 
  - exec executes the command that is passed after the container_name
  - -it means interactive mode
+   
  Example:
  ```bash
  docker exec -it mysql_latest /bin/bash
